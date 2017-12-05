@@ -9,30 +9,78 @@
 
 <body>
   <div id="app">
-    <form @submit.prevent="onSubmit" v-if="!submitted">
-      <div class="errors" v-if="errors">
-        {{errors}}
+    <div class="container">
+      <form @submit.prevent="onSubmit" v-if="!submitted">
+
+        <div class="row">
+          <div class="column">
+            <label>First Name:</label>
+            <input v-model="first_name" type="text" />
+          </div>
+
+          <div class="column">
+            <label>Last Name:</label>
+            <input v-model="last_name" type="text" />
+          </div>
+        </div>
+
+        <label>Email:</label>
+        <input v-model="email" type="email" />
+
+        <label>Make:</label>
+        <select class="" v-model="make" id="vehicle-makes">
+          <option selected disabled>Select Model</option>
+          <option v-for="option in make_opts" v-bind:value="option.id">
+            {{ option.text }}
+          </option>
+        </select>
+
+        <label>Model:</label>
+        <select id="vehicle-models" v-model="model">
+          <option selected disabled>Select Model</option>
+          <option 
+            v-for="option in model_opts[make]" 
+            :value="option.id" 
+            :key="option.id"
+          >
+            {{ option.text }}
+          </option>
+        </select>
+
+        <div class="errors" v-if="errors">
+          {{errors}}
+        </div>
+
+        <br />
+        <button type="submit">Submit</button>
+      </form>
+      <div v-else>
+        <h2>Your submission has saved with the following information:</h2>
+        <ul style="list-style-type: none;">
+          <li><strong>First name:</strong> {{this.submission.first_name}}</li>
+          <li><strong>Last name:</strong> {{this.submission.last_name}}</li>
+          <li><strong>Email:</strong> {{this.submission.email}}</li>
+          <li><strong>Make:</strong> {{this.submission.make}}</li>
+          <li><strong>Model:</strong> {{this.submission.model}}</li>
+        </ul>
       </div>
-
-      <label>name:</label>
-      <input v-model="name" type="text" />
-      
-      <br />
-      <button type="submit">Submit</button>
-    </form>
-
-    <div v-else>
-      <h1>Submitted with great success!</h1>
     </div>
+
   </div>
 
   <script src="https://unpkg.com/vue"></script>
   <script>
 
-    var makesAndModels = {
-      'BMW': ['m3', 'z3', 'x5'],
-      'Toyota': ['camry', 'ft-86', 'prius'],
-      'Subaru': ['brz', 'outback', 'legacy']
+    var make_opts = [
+      { text: "BMW", id: 1 },
+      { text: "Toyota", id: 2 },
+      { text: "Subaru", id: 3 }
+    ];
+
+    var model_opts = {
+      1: [{ text: "m3", id: 1 }, { text: "z3", id: 2 }, { text: "x5", id: 3 }],
+      2: [{ text: "camry", id: 4 }, { text: "ft-86", id: 5 }, { text: "prius", id: 6 }],
+      3: [{ text: "brz", id: 7 }, { text: "outback", id: 8 }, { text: "legacy", id: 9}]
     };
 
     var app = new Vue({
@@ -41,20 +89,36 @@
         return {
           submitted: false,
           errors: '',
-          name: '',
+          first_name: '',
+          last_name: '',
+          email: '',
+          make: null,
+          model: null,
+          make_opts: make_opts,
+          model_opts: model_opts,
+          submission: {}
         };
       },
       methods: {
         onSubmit() {
           this.errors = '';
 
-          if (!this.name) {
-            this.errors += 'name required';
+          this.submission = {
+            first_name: this.first_name,
+            last_name: this.last_name,
+            email: this.email,
+            make: this.make,
+            model: this.model
+          }
+
+          if (!this.first_name || !this.last_name || !this.email || !this.make || !this.model) {
+            this.errors += 'All fields required ';
           }
 
           if (!this.errors) {
             this.submitted = true;
           }
+
         }
       }
     });
